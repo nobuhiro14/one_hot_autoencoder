@@ -5,9 +5,9 @@ import torch.optim as optim
 import numpy as np
 from argparse import ArgumentParser
 
-from train_rep import train_rep,valid_rep
+from train import train_rep,valid_rep
 from train_no_rep import train,valid
-
+## python3 test.py
 class Option():
     def __init__(self):
         parser = ArgumentParser()

@@ -17,7 +17,7 @@ class encoder(nn.Module):
         #x = x/norm
         # 平均エネルギー制約
         mbs ,_,_ = x.shape
-        norm = torch.sqrt((x.norm(dim=2)**2).sum()/mbs)
+        norm = torch.sqrt((x.norm(dim=1)**2).sum()/mbs)
         x = x/norm
         return x
 
@@ -28,7 +28,7 @@ class encoder(nn.Module):
         s = self.enc2(s)
         mbs, n_len= s.shape
         n = int(n_len/2)
-        s = s.reshape(mbs,n,2)
+        s = s.reshape(mbs,2,n)
         y = self.normalize(s) # normalization
         return y
 
@@ -46,11 +46,11 @@ class repeater(nn.Module):
         #x = x/norm
         # 平均エネルギー制約
         mbs ,_,_ = x.shape
-        norm = torch.sqrt((x.norm(dim=2)**2).sum()/mbs)
+        norm = torch.sqrt((x.norm(dim=1)**2).sum()/mbs)
         x = x/norm
         return x
     def detection(self,x):
-        y = x[:,:,0]**2 + x[:,:,1]**2
+        y = x[:,0,:]**2 + x[:,1,:]**2
         return y
 
     def forward(self, m):
@@ -62,7 +62,7 @@ class repeater(nn.Module):
         s = self.mid3(s)
         mbs, n_len = s.shape
         n = int(n_len/2)
-        s = s.reshape(mbs,n,2)
+        s = s.reshape(mbs,2,n)
         y = self.normalize(s)
         return y
 
@@ -76,7 +76,7 @@ class decoder(nn.Module):
         self.softmax = torch.softmax
 
     def detection(self,x):
-        y = x[:,:,0]**2 + x[:,:,1]**2
+        y = x[:,0,:]**2 + x[:,0,:]**2
         return y
 
     def forward(self, m):
