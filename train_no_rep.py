@@ -13,11 +13,14 @@ def gen_minibatch(M,batch):
 def train(M,hidden,n,batch,sigma,epoch,learn_rate,alpha):
 
 
-    enc = encoder(M,hidden,n)
-    dec = decoder(M,hidden,n)
-    loss_func = nn.MSELoss()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    enc = encoder(M,hidden,n).to(device)
+    dec = decoder(M,hidden,n).to(device)
+    loss_func = nn.MSELoss().to(device)
     enc_opt= optim.Adam(enc.parameters(), lr=learn_rate)
     dec_opt = optim.Adam(dec.parameters(),lr = learn_rate)
+    enc.train()
+    dec.train()
 
 
     for i in range(epoch):
@@ -39,8 +42,13 @@ def train(M,hidden,n,batch,sigma,epoch,learn_rate,alpha):
     return enc,  dec
 
 def valid(enc,dec,M,batch,sigma,alpha):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    enc = enc.to(device)
+    dec = dec.to(device)
+    enc.eval()
+    dec.eval()
     m = gen_minibatch(M,batch)
-    loss_func = nn.MSELoss()
+    loss_func = nn.MSELoss().to(device)
     with torch.no_grad():
         m = gen_minibatch(M,batch)
         enc.zero_grad()
@@ -53,8 +61,8 @@ def valid(enc,dec,M,batch,sigma,alpha):
         m_hat = dec(noisy2)
 
     score = 0
-    m_np = m.detach().numpy()
-    m_hat_np = m_hat.detach().numpy()
+    m_np = m.detach().to("cpu").numpy()
+    m_hat_np = m_hat.detach().to("cpu").numpy()
     for ans , res in zip(m_np,m_hat_np):
       if np.where(ans ==1) == np.where(res == np.max(res)):
         score +=1

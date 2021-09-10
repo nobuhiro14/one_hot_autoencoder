@@ -10,7 +10,7 @@ from model import encoder, decoder, repeater
 def gen_minibatch(M,batch):
     one_hot_generator = torch.distributions.OneHotCategorical((1.0/M)*torch.ones(batch, M))
     return one_hot_generator.sample()
-def train_rep(M,hidden,n,batch,sigma,epoch,learn_rate):
+def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     enc = encoder(M,hidden,n).to(device)
@@ -24,23 +24,34 @@ def train_rep(M,hidden,n,batch,sigma,epoch,learn_rate):
     rep.train()
     dec.train()
 
+    #train encoder and decoder
     for i in range(epoch):
         m = gen_minibatch(M,batch)
         enc_opt.zero_grad()
-        rep_opt.zero_grad()
         dec_opt.zero_grad()
         enc_sig = enc(m)
         shape = enc_sig.shape
         noisy = enc_sig + torch.normal(torch.zeros(shape),std=sigma)
-        mid_sig = rep(noisy)
-        shape = mid_sig.shape
-        noisy = mid_sig + torch.normal(torch.zeros(shape),std=sigma)
         m_hat = dec(noisy)
         loss = loss_func(m_hat, m)
         loss.backward()
         enc_opt.step()
-        rep_opt.step()
         dec_opt.step()
+        if i % 1000 == 0:
+            print(i, loss.item())
+
+    #train repeater
+    enc.eval()
+    for i in range(epoch):
+        m = gen_minibatch(M,batch)
+        rep.zero_grad()
+        enc_sig = enc(m)
+        shape = enc_sig.shape
+        noisy = enc_sig + torch.normal(torch.zeros(shape),std=sigma)
+        pos_hat = rep(noisy)
+        loss = loss_func(pos_hat, enc_sig)
+        loss.backward()
+        rep_opt.step()
         if i % 1000 == 0:
             print(i, loss.item())
 
@@ -48,16 +59,14 @@ def train_rep(M,hidden,n,batch,sigma,epoch,learn_rate):
 
     return enc, rep, dec
 
-def valid_rep(enc,rep,dec,M,batch,sigma):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def valid_cl(enc,rep,dec,M,batch,sigma):
     m = gen_minibatch(M,batch)
-    loss_func = nn.MSELoss().to(device)
+    loss_func = nn.MSELoss()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    loss_func = loss_func.to(device)
     enc = enc.to(device)
     rep = rep.to(device)
     dec = dec.to(device)
-    enc.eval()
-    rep.eval()
-    dec.eval()
     with torch.no_grad():
         m = gen_minibatch(M,batch)
         enc_sig = enc(m)
@@ -66,7 +75,8 @@ def valid_rep(enc,rep,dec,M,batch,sigma):
         mid_sig = rep(noisy1)
         shape = mid_sig.shape
         noisy2 = mid_sig + torch.normal(torch.zeros(shape),std=sigma)
-        m_hat = dec(noisy2)
+        mid_sig = rep(noisy2)
+        m_hat = dec(mid_sig)
 
     score = 0
     m_np = m.detach().to("cpu").numpy()
@@ -96,25 +106,25 @@ def valid_rep(enc,rep,dec,M,batch,sigma):
     plt.grid()
     plt.gca().set_aspect('equal', adjustable='box')
     plt.scatter(x_re, x_im)
-    fig.savefig("encoder.png")
+    fig.savefig("encoder_cl.png")
     fig = plt.figure(figsize=(5,5))
     plt.xlim([-3,3])
     plt.ylim([-3,3])
     plt.grid()
     plt.gca().set_aspect('equal', adjustable='box')
     plt.scatter(n_re, n_im)
-    fig.savefig("noisy1.png")
+    fig.savefig("noisy1_cl.png")
     fig = plt.figure(figsize=(5,5))
     plt.xlim([-3,3])
     plt.ylim([-3,3])
     plt.grid()
     plt.gca().set_aspect('equal', adjustable='box')
     plt.scatter(m_re, m_im)
-    fig.savefig("repeater.png")
+    fig.savefig("repeater_cl.png")
     fig = plt.figure(figsize=(5,5))
     plt.xlim([-3,3])
     plt.ylim([-3,3])
     plt.grid()
     plt.gca().set_aspect('equal', adjustable='box')
     plt.scatter(y_re, y_im)
-    fig.savefig("noisy2.png")
+    fig.savefig("noisy2_cl.png")
