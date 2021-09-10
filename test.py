@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 
 from train import train_rep,valid_rep
 from train_no_rep import train,valid
+from train_classify import train_cl, valid_cl
 ## python3 test.py
 class Option():
     def __init__(self):
@@ -19,7 +20,7 @@ class Option():
         parser.add_argument("-epoch",type = int,default=8000)
         parser.add_argument("-learn_rate",type = float,default=0.01)
         parser.add_argument("-alpha",type=int,default=2)
-        parser.add_argument("-no_rep",action="store_true")
+        parser.add_argument("-mode",choices=["no_rep","rep","class"])
         self.parser = parser
 
     def get_param(self):
@@ -36,10 +37,16 @@ if __name__ == "__main__":
     ep = args.epoch
     lr = args.learn_rate
     alpha = args.alpha
-    if args.no_rep != True :
+    if args.mode =="rep" :
 
         enc, rep ,dec = train_rep(m,hidden,n,batch,sigma,ep,lr)
         valid_rep(enc,rep,dec,m,batch,sigma)
-    else :
+    elif args.mode =="no_rep" :
         enc, dec = train(m,hidden,n,batch,sigma,ep,lr,alpha)
         valid(enc,dec,m,batch,sigma,alpha)
+
+    elif args.mode =="class":
+        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr)
+        valid_cl(enc,rep,dec,m,batch,sigma)
+    else :
+        print(f"{args.mode} is not available")
