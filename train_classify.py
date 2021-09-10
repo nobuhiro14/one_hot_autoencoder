@@ -65,7 +65,6 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate):
 
 def valid_cl(enc,rep,dec,M,batch,sigma):
     m = gen_minibatch(M,batch)
-    m = m.to(device)
     loss_func = nn.MSELoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     loss_func = loss_func.to(device)
@@ -74,6 +73,7 @@ def valid_cl(enc,rep,dec,M,batch,sigma):
     dec = dec.to(device)
     with torch.no_grad():
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc_sig = enc(m)
         shape = enc_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
