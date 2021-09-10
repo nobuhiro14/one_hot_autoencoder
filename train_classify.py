@@ -27,6 +27,7 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate):
     #train encoder and decoder
     for i in range(epoch):
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc_opt.zero_grad()
         dec_opt.zero_grad()
         enc_sig = enc(m)
