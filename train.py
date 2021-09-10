@@ -26,6 +26,7 @@ def train_rep(M,hidden,n,batch,sigma,epoch,learn_rate):
 
     for i in range(epoch):
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc_opt.zero_grad()
         rep_opt.zero_grad()
         dec_opt.zero_grad()
@@ -62,6 +63,7 @@ def valid_rep(enc,rep,dec,M,batch,sigma):
     dec.eval()
     with torch.no_grad():
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc_sig = enc(m)
         shape = enc_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)

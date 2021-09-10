@@ -25,6 +25,7 @@ def train(M,hidden,n,batch,sigma,epoch,learn_rate):
 
     for i in range(epoch):
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc_opt.zero_grad()
         dec_opt.zero_grad()
         enc_sig = enc(m)
@@ -52,6 +53,7 @@ def valid(enc,dec,M,batch,sigma):
     loss_func = nn.MSELoss().to(device)
     with torch.no_grad():
         m = gen_minibatch(M,batch)
+        m = m.to(device)
         enc.zero_grad()
         dec.zero_grad()
         enc_sig = enc(m)
