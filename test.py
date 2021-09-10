@@ -44,7 +44,7 @@ if __name__ == "__main__":
         valid(enc,dec,m,batch,sigma)
 
     elif args.mode =="class0":
-        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
+        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,0)
         valid_cl(enc,rep,dec,m,batch,sigma)
     elif args.mode =="class1":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
