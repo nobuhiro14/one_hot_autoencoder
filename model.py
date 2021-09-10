@@ -37,9 +37,9 @@ class repeater(nn.Module):
         super(repeater, self).__init__()
         self.mid1 = nn.Linear(1*n, num_hidden_units) # 符号化器用レイヤー
         self.act1 = torch.relu
-        self.mid2 = nn.Linear(num_hidden_units,num_hidden_units*2)
+        self.mid2 = nn.Linear(num_hidden_units,num_hidden_units*3)
         self.act2 = torch.relu
-        self.mid3 = nn.Linear(num_hidden_units*2, 2*n) # 符号化器用レイヤー
+        self.mid3 = nn.Linear(num_hidden_units*3, 2*n) # 符号化器用レイヤー
     def normalize(self, x): # 送信信号の正規化
         # 等電力制約
         #norm = torch.norm(x,dim=1).view(mbs, 1).expand(-1, 2) # Normalization layer
