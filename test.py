@@ -45,12 +45,12 @@ if __name__ == "__main__":
 
     elif args.mode =="class0":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,0)
-        valid_cl(enc,rep,dec,m,batch,sigma)
+        valid_cl(enc,rep,dec,m,batch,sigma,0)
     elif args.mode =="class1":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
-        valid_cl(enc,rep,dec,m,batch,sigma)
+        valid_cl(enc,rep,dec,m,batch,sigma,1)
     elif args.mode =="class2":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,2)
-        valid_cl(enc,rep,dec,m,batch,sigma)
+        valid_cl(enc,rep,dec,m,batch,sigma,2)
     else :
         print(f"{args.mode} is not available")
