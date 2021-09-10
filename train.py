@@ -31,10 +31,12 @@ def train_rep(M,hidden,n,batch,sigma,epoch,learn_rate):
         dec_opt.zero_grad()
         enc_sig = enc(m)
         shape = enc_sig.shape
-        noisy = enc_sig + torch.normal(torch.zeros(shape),std=sigma)
+        gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy = enc_sig +gauss
         mid_sig = rep(noisy)
         shape = mid_sig.shape
-        noisy = mid_sig + torch.normal(torch.zeros(shape),std=sigma)
+        gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy = enc_sig +gauss
         m_hat = dec(noisy)
         loss = loss_func(m_hat, m)
         loss.backward()
@@ -62,10 +64,12 @@ def valid_rep(enc,rep,dec,M,batch,sigma):
         m = gen_minibatch(M,batch)
         enc_sig = enc(m)
         shape = enc_sig.shape
-        noisy1 = enc_sig + torch.normal(torch.zeros(shape),std=sigma)
+        gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy1 = enc_sig + gauss
         mid_sig = rep(noisy1)
         shape = mid_sig.shape
-        noisy2 = mid_sig + torch.normal(torch.zeros(shape),std=sigma)
+        gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy2 = mid_sig + gauss
         m_hat = dec(noisy2)
 
     score = 0

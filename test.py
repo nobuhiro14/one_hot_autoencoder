@@ -19,7 +19,6 @@ class Option():
         parser.add_argument("-gauss",type = float,default=0.1)
         parser.add_argument("-epoch",type = int,default=8000)
         parser.add_argument("-learn_rate",type = float,default=0.01)
-        parser.add_argument("-alpha",type=int,default=2)
         parser.add_argument("-mode",choices=["no_rep","rep","class"])
         self.parser = parser
 
@@ -36,14 +35,13 @@ if __name__ == "__main__":
     sigma = args.gauss
     ep = args.epoch
     lr = args.learn_rate
-    alpha = args.alpha
     if args.mode =="rep" :
 
         enc, rep ,dec = train_rep(m,hidden,n,batch,sigma,ep,lr)
         valid_rep(enc,rep,dec,m,batch,sigma)
     elif args.mode =="no_rep" :
-        enc, dec = train(m,hidden,n,batch,sigma,ep,lr,alpha)
-        valid(enc,dec,m,batch,sigma,alpha)
+        enc, dec = train(m,hidden,n,batch,sigma,ep,lr)
+        valid(enc,dec,m,batch,sigma)
 
     elif args.mode =="class":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr)

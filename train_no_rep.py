@@ -10,7 +10,7 @@ from model import encoder, decoder
 def gen_minibatch(M,batch):
     one_hot_generator = torch.distributions.OneHotCategorical((1.0/M)*torch.ones(batch, M))
     return one_hot_generator.sample()
-def train(M,hidden,n,batch,sigma,epoch,learn_rate,alpha):
+def train(M,hidden,n,batch,sigma,epoch,learn_rate):
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -29,7 +29,8 @@ def train(M,hidden,n,batch,sigma,epoch,learn_rate,alpha):
         dec_opt.zero_grad()
         enc_sig = enc(m)
         shape = enc_sig.shape
-        noisy = enc_sig + torch.normal(torch.zeros(shape),std=sigma*alpha)
+        gauss =  torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy = enc_sig +gauss
         #noisy = noisy + torch.normal(torch.zeros(shape),std=sigma)
         m_hat = dec(noisy)
         loss = loss_func(m_hat, m)
@@ -41,7 +42,7 @@ def train(M,hidden,n,batch,sigma,epoch,learn_rate,alpha):
 
     return enc,  dec
 
-def valid(enc,dec,M,batch,sigma,alpha):
+def valid(enc,dec,M,batch,sigma):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     enc = enc.to(device)
     dec = dec.to(device)
@@ -55,7 +56,8 @@ def valid(enc,dec,M,batch,sigma,alpha):
         dec.zero_grad()
         enc_sig = enc(m)
         shape = enc_sig.shape
-        noisy1 = enc_sig + torch.normal(torch.zeros(shape),std=sigma*alpha)
+        gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+        noisy1 = enc_sig +gauss
         #noisy2 = noisy1 + torch.normal(torch.zeros(shape),std=sigma)
         noisy2 = noisy1
         m_hat = dec(noisy2)
