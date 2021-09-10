@@ -63,6 +63,26 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate,flag):
         if i % 1000 == 0:
             print(i, loss.item())
 
+    if flag == 2:
+        rep.eval()
+        for i in range(epoch):
+            m = gen_minibatch(M,batch)
+            m = m.to(device)
+            dec.zero_grad()
+            enc_sig = enc(m)
+            shape = enc_sig.shape
+            gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+            noisy = enc_sig + gauss
+            pos_hat = rep(noisy)
+            gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
+            noisy = pos_hat + gauss
+            m_hat = dec(noisy)
+            loss = loss_func(m_hat, m)
+            loss.backward()
+            dec_opt.step()
+            if i % 1000 == 0:
+                print(i, loss.item())
+
 
 
     return enc, rep, dec
@@ -86,10 +106,8 @@ def valid_cl(enc,rep,dec,M,batch,sigma,flag):
         shape = mid_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
         noisy2 = mid_sig +gauss
-        if flag == 2:
-            mid_sig = noisy2
-        else :
-            mid_sig = rep(noisy2)
+
+        mid_sig = rep(noisy2)
         m_hat = dec(mid_sig)
 
     score = 0
