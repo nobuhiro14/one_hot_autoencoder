@@ -33,11 +33,11 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate,flag):
         enc_sig = enc(m)
         shape = enc_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
-        if flag == 1:
+        if flag == 0:
 
-            noisy = enc_sig + gauss
-        else :
             noisy = enc_sig
+        else  :
+            noisy = enc_sig + gauss
         m_hat = dec(noisy)
         loss = loss_func(m_hat, m)
         loss.backward()
@@ -67,7 +67,7 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate,flag):
 
     return enc, rep, dec
 
-def valid_cl(enc,rep,dec,M,batch,sigma):
+def valid_cl(enc,rep,dec,M,batch,sigma,flag):
     m = gen_minibatch(M,batch)
     loss_func = nn.MSELoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,7 +86,10 @@ def valid_cl(enc,rep,dec,M,batch,sigma):
         shape = mid_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
         noisy2 = mid_sig +gauss
-        mid_sig = rep(noisy2)
+        if flag == 2:
+            mid_sig = noisy2
+        else :
+            mid_sig = rep(noisy2)
         m_hat = dec(mid_sig)
 
     score = 0
