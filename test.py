@@ -49,7 +49,7 @@ if __name__ == "__main__":
     elif args.mode =="class1":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
         valid_cl(enc,rep,dec,m,batch,sigma)
-    elif args.mode =="class1":
+    elif args.mode =="class2":
         enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,2)
         valid_cl(enc,rep,dec,m,batch,sigma)
     else :
