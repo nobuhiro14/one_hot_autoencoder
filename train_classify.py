@@ -10,7 +10,7 @@ from model import encoder, decoder, repeater
 def gen_minibatch(M,batch):
     one_hot_generator = torch.distributions.OneHotCategorical((1.0/M)*torch.ones(batch, M))
     return one_hot_generator.sample()
-def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate):
+def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate,flag):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     enc = encoder(M,hidden,n).to(device)
@@ -33,7 +33,11 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate):
         enc_sig = enc(m)
         shape = enc_sig.shape
         gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
-        noisy = enc_sig + gauss
+        if flag == 1:
+
+            noisy = enc_sig + gauss
+        else :
+            noisy = enc_sig
         m_hat = dec(noisy)
         loss = loss_func(m_hat, m)
         loss.backward()

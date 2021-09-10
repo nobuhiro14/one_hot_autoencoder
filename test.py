@@ -19,7 +19,7 @@ class Option():
         parser.add_argument("-gauss",type = float,default=0.1)
         parser.add_argument("-epoch",type = int,default=8000)
         parser.add_argument("-learn_rate",type = float,default=0.01)
-        parser.add_argument("-mode",choices=["no_rep","rep","class"])
+        parser.add_argument("-mode",choices=["no_rep","rep","class0","class1"])
         self.parser = parser
 
     def get_param(self):
@@ -43,8 +43,11 @@ if __name__ == "__main__":
         enc, dec = train(m,hidden,n,batch,sigma,ep,lr)
         valid(enc,dec,m,batch,sigma)
 
-    elif args.mode =="class":
-        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr)
+    elif args.mode =="class0":
+        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
+        valid_cl(enc,rep,dec,m,batch,sigma)
+    elif args.mode =="class1":
+        enc, rep ,dec = train_cl(m,hidden,n,batch,sigma,ep,lr,1)
         valid_cl(enc,rep,dec,m,batch,sigma)
     else :
         print(f"{args.mode} is not available")
