@@ -76,7 +76,8 @@ def train_cl(M,hidden,n,batch,sigma,epoch,learn_rate,flag):
             pos_hat = rep(noisy)
             gauss = torch.normal(torch.zeros(shape),std=sigma).to(device)
             noisy = pos_hat + gauss
-            m_hat = dec(noisy)
+            pos_hat = rep(noisy)
+            m_hat = dec(pos_hat)
             loss = loss_func(m_hat, m)
             loss.backward()
             dec_opt.step()
